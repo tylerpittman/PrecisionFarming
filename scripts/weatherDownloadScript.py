@@ -1,5 +1,5 @@
 # python3 -tt /Users/tylerpittman/Farm/agYieldProject/weatherDownloadScript.py
-#https://api.weather.com/v2/pws/history/all?stationId=ILACADEN2&format=json&units=m&date=20180701
+#https://api.weather.com/v2/pws/history/all?stationId=ILACADEN2&format=json&units=m&date=20180701&apiKey=
 
 import requests
 import pandas as pd
