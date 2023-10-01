@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 
 station_ID = 'ILACADEN2'
-station_key = 'e4c4c2d55961437984c2d55961837966'
+station_key = ''
 start_date = 20180701 
 end_date = 20190630
 
