@@ -1,0 +1,226 @@
+# This converts to TopoJSON with boundary for every farm shapefile to be published on web in Mercator projection
+# 15 September 2018
+# bash /Users/tylerpittman/Farm/STEP_12_PUBLISH_create_TopoJSON_files_for_web_SMALLER_15September2018.bsh
+
+#rsync -vau /Library/Webserver/Documents/ /Users/tylerpittman/Sites
+#find /Library/Webserver/Documents/ -mindepth 1 -delete  ##to delete all files under /Library/WebServer/Documents
+
+## Do this to delete files when "rm *.png" gives argument too long error in directory ##
+# for i in *.txt; do rm "$i"; done
+# for i in *.png; do rm "$i"; done
+
+## Run the below commands as su - hduser
+# cp -r /Users/tylerpittman/Desktop/farm /Users/tylerpittman/Sites ##for MacBook
+# cp -r /Users/tylerpittman/Desktop/farm /var/www ##for sr71
+# find /var/www -type f -exec chmod 0640 {} \; ##for sr71
+# sudo find /var/www -type d -exec chmod 2750 {} \; ##for sr71
+
+## Run the below commands as regular user
+#scp -r /Users/tylerpittman/Sites/farm root@142.165.84.165:/var/www  ##for MacBook
+#scp /Users/tylerpittman/Sites/farm/field.php root@142.165.84.165:/var/www/farm  ##for MacBook
+#
+#sudo scp -r root@142.165.84.165:/var/www/farm /var/www ##for sr71
+#scp -r /var/www/farm hduser@142.165.84.165:/var/www ##for sr71
+#scp -r /var/www/farm hduser@96.53.16.86:/var/www ##for sr71
+#scp -r /var/www/farm hduser@184.69.221.186:/var/www ##for sr71
+#sudo rsync -vaHx --numeric-ids --exclude='/Users/tylerpittman/.gvfs' --delete / /media/tyler/MacBac/sr71 ##for sr71
+
+###----------------------###----------------------###----------------------###----------------------###
+###----------------------###----------------------###----------------------###----------------------###
+mkdir /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/input/2014/boundaries/*2014_boundary* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/input/2015/boundaries/*2015_boundary* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/input/2016/boundaries/*2016_boundary* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/input/2017/boundaries/*2017_boundary* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/input/2018/boundaries/*2018_boundary* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/yieldShapefiles/2014/*2014* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/yieldShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/yieldShapefiles/2016/*2016* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/yieldShapefiles/2017/*2017* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/yieldShapefiles/2018/*2018* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/harvestmShapefiles/2014/*2014* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/harvestmShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/harvestmShapefiles/2016/*2016* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/harvestmShapefiles/2017/*2017* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/harvestmShapefiles/2018/*2018* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/fuelrateShapefiles/2014/*2014* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/fuelrateShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/fuelrateShapefiles/2016/*2016* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/fuelrateShapefiles/2017/*2017* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/fuelrateShapefiles/2018/*2018* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationShapefiles/2014/*2014* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationShapefiles/2016/*2016* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationShapefiles/2017/*2017* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationShapefiles/2018/*2018* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/elevationSprayerShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/seedShapefiles/2015/*2015* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/seedShapefiles/2016/*2016* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/seedShapefiles/2017/*2017* /Users/tylerpittman/Desktop/working
+cp /Users/tylerpittman/Farm/seedShapefiles/2018/*2018* /Users/tylerpittman/Desktop/working
+cd /Users/tylerpittman/Desktop/working
+
+for FILE in *.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/_ca.shp/"`; ogr2ogr -f 'ESRI Shapefile' -s_srs 'EPSG:2956' -t_srs 'EPSG:3395' $FILENEW $FILE; done;
+
+
+for FILE in *2014_boundary_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property SP_ID_1 -p -- field=$FILE; done;
+
+for FILE in *yield_proj_2014_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Yield -p -- quintiles=$FILE; done;
+for FILE in *yield_proj_2014_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_yield_proj_2014_ca.json/_2014_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Yield -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *harvestm_proj_2014_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Moisture -p -- quintiles=$FILE; done;
+for FILE in *harvestm_proj_2014_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_harvestm_proj_2014_ca.json/_2014_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Moisture -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *fuelrate_proj_2014_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property FuelRate -p -- quintiles=$FILE; done;
+for FILE in *fuelrate_proj_2014_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_fuelrate_proj_2014_ca.json/_2014_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property FuelRate -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *elevation_proj_2014_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevation_proj_2014_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevation_proj_2014_ca.json/_2014_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+
+
+for FILE in *2015_boundary_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property SP_ID_1 -p -- field=$FILE; done;
+
+for FILE in *elevations_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevations_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevations_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *yield_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Yield -p -- quintiles=$FILE; done;
+for FILE in *yield_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_yield_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Yield -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *harvestm_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Moisture -p -- quintiles=$FILE; done;
+for FILE in *harvestm_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_harvestm_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Moisture -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *fuelrate_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property FuelRate -p -- quintiles=$FILE; done;
+for FILE in *fuelrate_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_fuelrate_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property FuelRate -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *elevation_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevation_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevation_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank1_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank1_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank1_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank2_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank2_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank2_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank3_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank3_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank3_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank4_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank4_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank4_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank5_proj_2015_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank5_proj_2015_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank5_proj_2015_ca.json/_2015_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+
+
+for FILE in *2016_boundary_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property SP_ID_1 -p -- field=$FILE; done;
+
+#for FILE in *elevations_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+#for FILE in *elevations_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevations_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *yield_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Yield -p -- quintiles=$FILE; done;
+for FILE in *yield_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_yield_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Yield -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *harvestm_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Moisture -p -- quintiles=$FILE; done;
+for FILE in *harvestm_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_harvestm_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Moisture -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *fuelrate_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property FuelRate -p -- quintiles=$FILE; done;
+for FILE in *fuelrate_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_fuelrate_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property FuelRate -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *elevation_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevation_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevation_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank1_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank1_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank1_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank2_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank2_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank2_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank3_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank3_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank3_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank4_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank4_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank4_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank5_proj_2016_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank5_proj_2016_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank5_proj_2016_ca.json/_2016_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+
+
+for FILE in *2017_boundary_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property SP_ID_1 -p -- field=$FILE; done;
+
+for FILE in *yield_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Yield -p -- quintiles=$FILE; done;
+for FILE in *yield_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_yield_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Yield -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *harvestm_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Moisture -p -- quintiles=$FILE; done;
+for FILE in *harvestm_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_harvestm_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Moisture -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *fuelrate_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property FuelRate -p -- quintiles=$FILE; done;
+for FILE in *fuelrate_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_fuelrate_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property FuelRate -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *elevation_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevation_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevation_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank1_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank1_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank1_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank2_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank2_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank2_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank3_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank3_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank3_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank4_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank4_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank4_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank5_proj_2017_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank5_proj_2017_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank5_proj_2017_ca.json/_2017_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+
+
+for FILE in *2018_boundary_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property SP_ID_1 -p -- field=$FILE; done;
+
+for FILE in *yield_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Yield -p -- quintiles=$FILE; done;
+for FILE in *yield_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_yield_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Yield -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *harvestm_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Moisture -p -- quintiles=$FILE; done;
+for FILE in *harvestm_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_harvestm_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Moisture -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *fuelrate_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property FuelRate -p -- quintiles=$FILE; done;
+for FILE in *fuelrate_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_fuelrate_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property FuelRate -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *elevation_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Elevation -p -- quintiles=$FILE; done;
+for FILE in *elevation_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_elevation_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Elevation -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank1_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank1_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank1_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank2_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank2_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank2_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank3_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank3_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank3_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank4_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank4_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank4_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+for FILE in *seedTank5_proj_2018_ca.shp; do echo "converting file: $FILE..."; FILENEW=`echo $FILE | sed "s/.shp/.json/"`; topojson -o $FILENEW --id-property Seed -p -- quintiles=$FILE; done;
+for FILE in *seedTank5_proj_2018_ca.json; do echo "converting file: $FILE..."; BNAME=$(echo "$FILE" | sed 's/_seedTank5_proj_2018_ca.json/_2018_boundary_ca.json/'); echo "boundary filename: $BNAME"; topojson --width 800 --height 600 --margin 20 -s .50 --id-property Seed -p --allow-empty -o $FILE -- $FILE $BNAME; done;
+
+
+
+for f in *_2014_boundary_ca.shp; do ogr2ogr -update -append fields_2014.shp $f -f "ESRI Shapefile" -s_srs 'EPSG:3395' -t_srs 'EPSG:3395'; done;
+topojson --width 800 --height 600 --margin 20 -s .50 -o fieldBoundaries2014.json --id-property SP_ID_1 -p -- fields=fields_2014.shp;
+for f in *_2015_boundary_ca.shp; do ogr2ogr -update -append fields_2015.shp $f -f "ESRI Shapefile" -s_srs 'EPSG:3395' -t_srs 'EPSG:3395'; done;
+topojson --width 800 --height 600 --margin 20 -s .50 -o fieldBoundaries2015.json --id-property SP_ID_1 -p -- fields=fields_2015.shp;
+for f in *_2016_boundary_ca.shp; do ogr2ogr -update -append fields_2016.shp $f -f "ESRI Shapefile" -s_srs 'EPSG:3395' -t_srs 'EPSG:3395'; done;
+topojson --width 800 --height 600 --margin 20 -s .50 -o fieldBoundaries2016.json --id-property SP_ID_1 -p -- fields=fields_2016.shp;
+for f in *_2017_boundary_ca.shp; do ogr2ogr -update -append fields_2017.shp $f -f "ESRI Shapefile" -s_srs 'EPSG:3395' -t_srs 'EPSG:3395'; done;
+topojson --width 800 --height 600 --margin 20 -s .50 -o fieldBoundaries2017.json --id-property SP_ID_1 -p -- fields=fields_2017.shp;
+for f in *_2018_boundary_ca.shp; do ogr2ogr -update -append fields_2018.shp $f -f "ESRI Shapefile" -s_srs 'EPSG:3395' -t_srs 'EPSG:3395'; done;
+topojson --width 800 --height 600 --margin 20 -s .50 -o fieldBoundaries2018.json --id-property SP_ID_1 -p -- fields=fields_2018.shp;
+
+cp *proj*_ca.json /Users/tylerpittman/Desktop/farm/field
+cp fieldBoundaries*.json /Users/tylerpittman/Desktop/farm
+###----------------------###----------------------###----------------------###----------------------###
+###----------------------###----------------------###----------------------###----------------------###
