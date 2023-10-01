@@ -23,4 +23,5 @@ Order to run farm scripts \
 [STEP_17_ANALYSIS_yield_map_15December2019.R](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_17_ANALYSIS_yield_map_15December2019.R) \
 [STEP_18_farm_rainfall_data_SwiftCurrent_5February2020.R](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_18_farm_rainfall_data_SwiftCurrent_5February2020.R) \
 [STEP_19_FARM_RECORDS_1986_2018_analysis_22December2019.R](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_19_FARM_RECORDS_1986_2018_analysis_22December2019.R) \
+[weatherDownloadScript.py](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/weatherDownloadScript.py) \
 #!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!# 
