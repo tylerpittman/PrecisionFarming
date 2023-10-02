@@ -1,5 +1,7 @@
 # PrecisionFarming
 
+R, Python and Linux shell script programming with Esri shapefiles, GeoJSON and TopoJSON. Utilized in GreenStar and Topcon systems.
+
 #!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!# \
 Order to run farm scripts \
 [STEP_0_OPTIONAL_rename_shapefiles_24Mar2015.py](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_0_OPTIONAL_rename_shapefiles_24Mar2015.py) \
