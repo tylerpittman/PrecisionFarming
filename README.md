@@ -3,7 +3,7 @@
 R, Python and Linux shell script programming with Esri shapefiles, GeoJSON and TopoJSON. Utilized in GreenStar and Topcon systems.
 
 #!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!#!-@-!# \
-Order to run farm scripts \
+Order to run precision farm scripts \
 [STEP_0_OPTIONAL_rename_shapefiles_24Mar2015.py](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_0_OPTIONAL_rename_shapefiles_24Mar2015.py) \
 [STEP_1_USING_YIELD_QUINTILE_POLYGONS_contour_polygons_multi_years_9March2018.R](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_1_USING_YIELD_QUINTILE_POLYGONS_contour_polygons_multi_years_9March2018.R) \
 [STEP_2_addFields_to_shapefile_10March2018.py](https://github.com/tylerpittman/PrecisionFarming/tree/main/scripts/STEP_2_addFields_to_shapefile_10March2018.py) \
